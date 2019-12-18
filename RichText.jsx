@@ -66,13 +66,18 @@ function applySimpleStyle(tag, fontStyle)
 function replaceGlyphs() {
 	if(app.documents.length != 0) {
 		var doc = app.activeDocument;	
-		var folderPath = "C:/Users/bdsow/Desktop/HeyCutieEmoji";
-
+		
 		app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
 		app.findGrepPreferences.findWhat = "@.+?@";
 		var f = doc.findGrep(true);
 		
+		if (f.length == 0)
+			return;
+			
 		var rect = null;
+
+		var folder = Folder.selectDialog("Choose a folder with images");
+		var folderPath = folder.fsName;
 
 		for (i = 0; i < f.length; i++) {
 			var name = f[i].contents.replace(/@/g, "");
