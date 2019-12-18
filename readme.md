@@ -21,9 +21,9 @@ The RichText script seeks to change that: run the script over your files after
 the spreadsheet import, and this script will apply markups to your text.
 
 ### Markup:
-- <b>Make text bold by putting it in</b> tags
-- <i>Make text italic by putting it in </i> tags
-- <bi>Make text bold & italic by putting it in </bi> tags
+- `<b>`Make text <b>bold</b> by putting it in `</b>` tags
+- `<i>`Make text <i>italic</i> by putting it in `</i>` tags
+- `<bi>`Make text <b><i>bold & italic</i></b> by putting it in `</bi>` tags
 - Drop in a @glyph@ by putting the glyph name within @ characters.
 
 ### Limitations:
