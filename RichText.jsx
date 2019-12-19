@@ -21,6 +21,7 @@
 //	fit method
 //	y offset
 
+//@include "Utilities.jsx"
 
 app.doScript(richText, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Rich Text");
 
@@ -89,6 +90,19 @@ function applySimpleStyle(tag, fontStyle)
 	app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
 }
 
+function glyphInfoForName(glyphConfig, name)
+{
+	for (var row = 0; row < glyphConfig.length; ++row)
+	{
+		if (trim(glyphConfig[row][0]) == trim(name))
+		{
+			return glyphConfig[row];
+		}
+	}
+
+	return null;	
+}
+
 function replaceGlyphs() {
 	if(app.documents.length != 0) {
 		var doc = app.activeDocument;	
@@ -102,30 +116,34 @@ function replaceGlyphs() {
 
 		var rect = null;
 
-		var folder = Folder.selectDialog("Choose a folder with images");
-		var folderPath = folder.fsName;
+		var configFile = File.openDialog();
+		var configFilePath = configFile.path;
+		var glyphConfig = parseCSVWithFile(configFile);
 
 		for (i = 0; i < f.length; i++) {
 			var name = f[i].contents.replace(/@/g, "");
-			var file = new File(folderPath + "/" + name + ".png");
+			var glyphInfo = glyphInfoForName(glyphConfig, name);
 			
-			if (file.exists) {
+			if (glyphInfo == null)
+				continue;
+
+			var glyphPath = configFilePath + "/" + glyphInfo[1];
+			var glyphFile = new File(glyphPath);
+			
+			if (glyphFile.exists) {
 				// Create a rectangle to hold the glyph
-				rect = f[i].insertionPoints[0].rectangles.add( {geometricBounds:[0,0, 5, 5 ]} );
+				size = strToSizeArray(glyphInfo[2]);
+				rect = f[i].insertionPoints[0].rectangles.add( {geometricBounds:[0,0, size[0], size[1] ]} );
 				rect.strokeWeight = 0;
 
 				// Place the glyph inside the rectangle
-				rect.place(file);
+				rect.place(glyphFile);
 
 				// Set the fit options
-				// CONTENT_TO_FRAME - stretch
-				// FILL_PROPORTIONALLY
-				// PROPORTIONALLY - may end up w/whitespace depending on frame size & image size
-				// FRAME_TO_CONTENT
-				rect.fit (FitOptions.PROPORTIONALLY);
+				rect.fit(strToFitMethod(glyphInfo[3]));
 				
 				// Shift glyph by some offset
-				rect.anchoredObjectSettings.anchorYoffset = -1.3;
+				rect.anchoredObjectSettings.anchorYoffset = Number(glyphInfo[4]);
 				
 				// Remove the regex
 				f[i].remove();
@@ -140,4 +158,40 @@ function replaceGlyphs() {
 	else{
 		alert("Please open a document and try again.");
 	}	
+}
+
+function strToFitMethod(str)
+{
+	str = trim(str).toUpperCase();
+	if (str == "PROPORTIONALLY")
+	{
+		return FitOptions.PROPORTIONALLY;
+	}
+	else if (str == "CONTENT_TO_FRAME")
+	{
+		return FitOptions.CONTENT_TO_FRAME;
+	}
+	else if (str == "FILL_PROPORTIONALLY")
+	{
+		return FitOptions.FILL_PROPORTIONALLY;
+	}
+	else if (str == "FRAME_TO_CONTENT")
+	{
+		return FitOptions.FRAME_TO_CONTENT;
+	}
+	else if (str == "CENTER_CONTENT")
+	{
+		return FitOptions.CENTER_CONTENT;
+	}
+
+	return FitOptions.PROPORTIONALLY;
+}
+
+function strToSizeArray(str)
+{
+	return [5,5];
+
+	str = trim(str);
+	elements = str.split(",");
+	return [Number(elements[0]), Number(elements[1])];
 }

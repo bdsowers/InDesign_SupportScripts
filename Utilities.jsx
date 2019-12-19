@@ -38,8 +38,30 @@ function csvStringToArray(str) {
     return arr;
 }
 
-// Because apparently they left trim out?!
+function parseCSV()
+{
+    var file = File.openDialog();   
+    return parseCSVWithFile(file);
+}
 
+function parseCSVWithPath(path)
+{
+    var file = new File(path);
+    file.open("r");
+    var csv = file.read();
+
+    return csvStringToArray(csv);
+}
+
+function parseCSVWithFile(file)
+{
+    file.open("r");
+    var csv = file.read();
+    
+    return csvStringToArray(csv);
+}
+
+// Because apparently they left trim out?!
 function trim(str)
 {
     return str.replace(/^\s+|\s+$/gm,'');

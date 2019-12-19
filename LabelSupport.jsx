@@ -87,15 +87,6 @@ function disabledItemsInfo(csvArr)
 	return -1;	
 }
 
-function parseCSV()
-{
-	var file = File.openDialog();	
-	file.open("r");
-	var csv = file.read();
-
-	return csvStringToArray(csv);
-}
-
 function hideObjectsWithLabel(label, page)
 {
 	var objects = [];
