@@ -28,6 +28,9 @@ you want to format, and the script will handle the formatting.
 - Make text <i>italic</i> by putting it in `<i>italic</i>` tags
 - Make text <b><i>bold & italic</i></b> by putting it in `<bi>bold italic</bi>` tags
 - Drop in a @glyph@ by putting the glyph name within @ characters.
+- Add manual newlines using a single `<break>` tag. Line breaks in a CSV will blow things up.
+- Add manual double breaks using a `<dbreak>` tag.
+- Designate an empty data cell using the `<empty>` tag, which will be replaced with empty text.
 
 ### Glyph Use:
 To utilize glyphs, the script needs configuration information for each glyph.
