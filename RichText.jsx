@@ -2,6 +2,9 @@
 // <b>bold content</b>
 // <i>italic content</i>
 // <bi>bold italic content</bi>
+// <empty> - used for empty data cells
+// <break> - used to place linebreaks in a cell
+// <dbreak> - used to place double breaks in a cell
 
 // IN THE WORKS:
 // <font="font">change font</font>

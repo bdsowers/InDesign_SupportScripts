@@ -1,4 +1,4 @@
-# Support Scripts for InDesing
+# Support Scripts for InDesign
 These are scripts developed largely to aid in board game development.
 
 ## Installation
