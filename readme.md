@@ -51,3 +51,23 @@ and use that file for configuration.
 - Support for simple font changes
 - Support for applying arbitrary character styles
 - More robust error handling
+
+## Label Support
+For large projects, sometimes you want to dynamically control visibility.
+Most notably, you may want certain images to only be visible on certain items (example: you may
+only want a Weapon symbol to show up on Attack cards). You'll want to specify this in
+your data spreadsheet for easy changes.
+
+InDesign doesn't have a mechanism to handle that.
+
+The LabelSupport script is intended to aid in that need.
+
+### Script Label Use
+Sometimes your data flow needs to find an object and do something with it - usually hide
+it for components that don't need it.
+
+For code to be able to find that object, it needs to be given a name. Enter Script Labels.
+
+In InDesign, use Windows -> Utilities -> Script Labels
+
+Click on objects that need special handling a type in a label for them.
