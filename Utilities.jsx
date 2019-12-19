@@ -1,3 +1,7 @@
+// Yanked from StackOverflow because we're in 2019 now and CSV parsing
+// still is something you have to dig through solutions for...
+// https://stackoverflow.com/questions/1293147/javascript-code-to-parse-csv-data
+
 function csvStringToArray(str) {
     var arr = [];
     var quote = false;  // true means we're inside a quoted field
