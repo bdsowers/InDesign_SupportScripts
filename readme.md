@@ -76,7 +76,7 @@ in the label you want to provide.
 In data, if you name your column v_[script_label], fill that column
 with TRUE or FALSE - TRUE if the thing should remain, FALSE otherwise.
 
-Then run the LabelSupport script. Anything with the [script_label] label
+Then run the LabelSupport script and choose your CSV data file. Anything with the [script_label] label
 that is set to FALSE in the data will be removed from the image.
 
 ### Disabling Objects (Option 2)
@@ -84,7 +84,7 @@ In data, name a column disabled_items.
 For each entry that wants to disable (remove) items, add the label to that cell.
 If you want to remove multiple items, separate their labels by commas.
 
-Then run the LabelSupport script. It will look at the comma-separated list
+Then run the LabelSupport script and choose your CSV data file. It will look at the comma-separated list
 and remove anything matching that pattern.
 
 ### Limitations
