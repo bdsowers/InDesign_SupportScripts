@@ -5,7 +5,7 @@ These are scripts developed largely to aid in board game development.
 Drop the entire folder into your InDesign script directory.
 
 On Windows, this is:
-C:\Users\<your_username>\AppData\Roaming\Adobe\InDesign\<version>\en_US\Scripts\Scripts Panel\
+C:\Users\[your_username]\AppData\Roaming\Adobe\InDesign\[version]\en_US\Scripts\Scripts Panel\
 
 ## Usage
 - In InDesign, open the Scripts window (Windows -> Utilities -> Scripts)
@@ -62,12 +62,22 @@ InDesign doesn't have a mechanism to handle that.
 
 The LabelSupport script is intended to aid in that need.
 
-### Script Label Use
-Sometimes your data flow needs to find an object and do something with it - usually hide
-it for components that don't need it.
+### Giving Names to Things
+For objects that need to be reference in a special way, they need script labels.
 
-For code to be able to find that object, it needs to be given a name. Enter Script Labels.
+In InDesign, Windows -> Utilities -> Script Labels
 
-In InDesign, use Windows -> Utilities -> Script Labels
+### Disabling Objects (Option 1)
+In data, if you name your column v_[script_label], fill that column
+with TRUE or FALSE - TRUE if the thing should remain, FALSE otherwise.
 
-Click on objects that need special handling a type in a label for them.
+Then run the LabelSupport script. Anything with the [script_label] label
+that is set to FALSE in the data will be removed from the image.
+
+### Disabling Objects (Option 2)
+In data, name a column disabled_items.
+For each entry that wants to disable (remove) items, add the label to that cell.
+If you want to remove multiple items, separate their labels by commas.
+
+Then run the LabelSupport script. It will look at the comma-separated list
+and remove anything matching that pattern.

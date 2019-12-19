@@ -37,3 +37,10 @@ function csvStringToArray(str) {
     }
     return arr;
 }
+
+// Because apparently they left trim out?!
+
+function trim(str)
+{
+    return str.replace(/^\s+|\s+$/gm,'');
+}

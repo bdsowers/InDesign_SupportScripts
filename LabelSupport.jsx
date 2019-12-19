@@ -1,12 +1,13 @@
 //@include "Utilities.jsx"
 
-app.doScript(tagSupport, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Tag Support");
+app.doScript(labelSupport, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Tag Support");
 
-function tagSupport()
+function labelSupport()
 {
 	var arr = parseCSV();
 	
-	visInfo = visibilityColumnInformation(arr);
+	var visInfo = visibilityColumnInformation(arr);
+	var disableInfoCol = disabledItemsInfo(arr); 
 
 	var doc = app.activeDocument;
 	for (var pageIdx = 0; pageIdx < doc.pages.length; ++pageIdx)
@@ -14,19 +15,45 @@ function tagSupport()
 		var page = doc.pages[pageIdx];
 
 		if (arr.length > pageIdx + 1)
-		{
+		{	
 			var csvRow = arr[pageIdx + 1];
 
-			for (var visInfoIdx = 0; visInfoIdx < visInfo.length; ++visInfoIdx)
-			{
-				var cellPosition = visInfo[visInfoIdx][0];
-				var label = visInfo[visInfoIdx][1];
-				var isVisible = (csvRow[cellPosition] == 'TRUE');
+			// METHOD 1: Use columns starting with v_ to control visibility
+			hideUsingVisibilityColumns(csvRow, page, visInfo);
 
-				if (!isVisible)
-				{
-					hideObjectsWithLabel(label, page);
-				}
+			// METHOD 2: Use disabled_items column to control visibility
+			hideUsingDisabledItemsColumn(csvRow, page, disableInfoCol);
+		}
+	}
+}
+
+function hideUsingVisibilityColumns(csvRow, page, visInfo)
+{
+	for (var visInfoIdx = 0; visInfoIdx < visInfo.length; ++visInfoIdx)
+	{
+		var cellPosition = visInfo[visInfoIdx][0];
+		var label = trim(visInfo[visInfoIdx][1]);
+		var isVisible = (trim(csvRow[cellPosition]) == 'TRUE');
+
+		if (!isVisible)
+		{
+			hideObjectsWithLabel(label, page);
+		}
+	}	
+}
+
+function hideUsingDisabledItemsColumn(csvRow, page, disableInfoCol)
+{
+	if (disableInfoCol != -1)
+	{
+		var listStr = csvRow[disableInfoCol];
+		var list = listStr.split(',');
+		for (var disabledItemIdx = 0; disabledItemIdx < list.length; ++disabledItemIdx)
+		{
+			var disabledItem = trim(list[disabledItemIdx]);
+			if (disabledItem.length > 0)
+			{
+				hideObjectsWithLabel(disabledItem, page);
 			}
 		}
 	}
@@ -45,6 +72,19 @@ function visibilityColumnInformation(csvArr)
 	}
 
 	return positions;
+}
+
+function disabledItemsInfo(csvArr)
+{
+	for (var i = 0; i < csvArr[0].length; ++i)
+	{
+		if (csvArr[0][i] == "disabled_items")
+		{
+			return i;
+		}
+	}
+
+	return -1;	
 }
 
 function parseCSV()
