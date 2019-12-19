@@ -38,7 +38,30 @@ function applyComplexStyles() {
 function fontStyle() {
 	applySimpleStyle("b", "Bold");
 	applySimpleStyle("i", "Italic");
-	applySimpleStyle("bi", "Bold Italic");	
+	applySimpleStyle("bi", "Bold Italic");
+
+	applyTextReplace("break", "\n");
+	applyTextReplace("dbreak", "\n\n");
+	applyTextReplace("empty", "");	
+}
+
+function applyTextReplace(tag, changeCode)
+{
+	var doc = app.activeDocument;
+
+	app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
+
+	var beginTag = "<" + tag + ">";
+	
+	app.findGrepPreferences.findWhat = beginTag;
+	var f = doc.findGrep(true);
+
+	for (i = 0; i < f.length; i++)
+	{
+		f[i].contents = changeCode;
+	}
+
+	app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
 }
 
 function applySimpleStyle(tag, fontStyle)
@@ -73,7 +96,7 @@ function replaceGlyphs() {
 		
 		if (f.length == 0)
 			return;
-			
+
 		var rect = null;
 
 		var folder = Folder.selectDialog("Choose a folder with images");
