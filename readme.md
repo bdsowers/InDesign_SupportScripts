@@ -5,7 +5,12 @@ These are scripts developed largely to aid in board game development.
 Drop the entire folder into your InDesign script directory.
 
 On Windows, this is:
-C:\Users\[your_username]\AppData\Roaming\Adobe\InDesign\[version]\en_US\Scripts\Scripts Panel\
+C:/Users/[your_username]/AppData/Roaming/Adobe/InDesign/[version]/en_US/Scripts/Scripts Panel/
+
+If you open up the Scripts system in InDesign, you can find the exact folder easily:
+- Windows -> Utilities -> Scripts
+- Right click the 'User' folder
+- Click 'Reveal in Explorer' (or Reveal in Finder)
 
 ## Usage
 - In InDesign, open the Scripts window (Windows -> Utilities -> Scripts)
@@ -81,3 +86,18 @@ If you want to remove multiple items, separate their labels by commas.
 
 Then run the LabelSupport script. It will look at the comma-separated list
 and remove anything matching that pattern.
+
+### Limitations
+The label support script assumes you have one page per data row in your spreadsheet.
+It's not currently setup to handle more intricate layouts. 
+
+## Overall Goals & Roadmap
+My goal with these scripts is to facilitate an end-to-end export pipeline for
+complicated board games with as little human interaction as possible. Take your
+spreadsheets & InDesign layout files, hit a few buttons, and you have print-ready files.
+
+Some things which I'd like to support, but are still under investigation:
+- Providing project-level configuration where users don't have to manually choose files/folders when they want to do something.
+- A mechanism for doing automatic data merges & running these scripts over multiple files.
+- Layer handling, though layers are used much less frequently in InDesign.
+- I know how I'd lay out my files, but I don't know how other people do it. I need more visibility into the workflows of other teams to adapt these scripts to meet their needs.
