@@ -36,11 +36,7 @@ you want to format, and the script will handle the formatting.
 To utilize glyphs, the script needs configuration information for each glyph.
 
 By default, the script will ask for a configuration file that details glyph configuration.
-An example file is contained in SupportScripts/Examples/RichText
-
-For automation purposes this is non-ideal. Use the RichTextFullyAutomated script for this.
-This script will look in your User folder for a file named indesign_richtext_config.csv
-and use that file for configuration.
+An example file is contained in SupportScripts/Examples/GlyphExamples
 
 ### Limitations:
 - Nested tags are not supported.
