@@ -47,10 +47,7 @@ function parseCSV()
 function parseCSVWithPath(path)
 {
     var file = new File(path);
-    file.open("r");
-    var csv = file.read();
-
-    return csvStringToArray(csv);
+    return parseCSVWithFile(file);
 }
 
 function parseCSVWithFile(file)

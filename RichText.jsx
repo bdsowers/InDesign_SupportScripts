@@ -116,9 +116,17 @@ function replaceGlyphs() {
 
 		var rect = null;
 
-		var configFile = File.openDialog();
-		var configFilePath = configFile.path;
-		var glyphConfig = parseCSVWithFile(configFile);
+		var configFile = null;
+		var configFilePath = null;
+		var glyphConfig = null;
+
+		// Only ask for glyph configuration if we're using glyphs
+		if (f.length > 0)
+		{
+			configFile = File.openDialog();
+			configFilePath = configFile.path;
+			glyphConfig = parseCSVWithFile(configFile);
+		}
 
 		for (i = 0; i < f.length; i++) {
 			var name = f[i].contents.replace(/@/g, "");
