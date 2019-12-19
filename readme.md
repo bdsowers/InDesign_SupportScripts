@@ -63,9 +63,13 @@ InDesign doesn't have a mechanism to handle that.
 The LabelSupport script is intended to aid in that need.
 
 ### Giving Names to Things
-For objects that need to be reference in a special way, they need script labels.
+For objects that need to be referenced by the LabelSupport script,
+those things need to be given names.
 
 In InDesign, Windows -> Utilities -> Script Labels
+
+Click on the thing you want to give a name to (a script label), and type
+in the label you want to provide.
 
 ### Disabling Objects (Option 1)
 In data, if you name your column v_[script_label], fill that column
