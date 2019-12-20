@@ -232,11 +232,14 @@ function applyComplexStyle(tag, responseFunction, containsInnerElement)
 
 	app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
 
-	var str = "<" + tag + ".+?>.+?" + "</" + tag + ">";
+	var str = "(<" + tag + ".+?>)(.+?)" + "(</" + tag + ">)";
+	
 	if (!containsInnerElement)
 	{
 		str = "<" + tag + ".+?>";
 	}
+
+	var regEx = new RegExp(str);
 
 	app.findGrepPreferences.findWhat = str;
 	var f = doc.findGrep(true);
@@ -250,6 +253,15 @@ function applyComplexStyle(tag, responseFunction, containsInnerElement)
 		responseFunction(f[i], parameters);
 
 		// Cut out the tags.
+		var result = regEx.exec(f[i].contents);
+		if (!containsInnerElement)
+		{
+			// f[i].remove();
+		}
+		else if (result != null)
+		{
+			f[i].contents = result[2];
+		}
 	}
 
 	app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
