@@ -63,3 +63,37 @@ function trim(str)
 {
     return str.replace(/^\s+|\s+$/gm,'');
 }
+
+
+function characterStyleByName(doc, name)
+{
+    var style = doc.characterStyles.item(name);
+    if (style == null || !style.isValid)
+        return null;
+    return style;
+}
+
+function paragraphStyleByName(doc, name)
+{
+    var style = doc.paragraphStyles.item(name);
+    if (style == null || !style.isValid)
+        return null;
+    return style;
+}
+
+function colorByName(doc, name)
+{
+    var color = doc.colors.item(name);
+    if (color == null || !color.isValid)
+    {
+        return null;
+    }
+    return color;
+}
+
+function makeColor(doc, colorName, colorSpace, colorModel, colorValue) 
+{ 
+    color = doc.colors.add({name: colorName, space: colorSpace, model: colorModel, colorValue: colorValue}); 
+    
+    return color; 
+} 

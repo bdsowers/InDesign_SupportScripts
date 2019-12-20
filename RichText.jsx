@@ -10,18 +10,14 @@
 // glyphs in @here@ work too
 // <cstyle="Strong">Apply an InDesign character style</cstyle>
 // <pstyle="Paragraph Style 1">Apply an InDesign paragraph style</cstyle>
+// <colorrgb value="r,g,b">apply an RGB color</color>
+// <colorcmyk value="c,m,y,k">apply a CMYK color</color>
+// <color name="name">apply a named color</color>
 
-// IN THE WORKS:
-// <colorhex="HEX">apply a hex color</color>
-// <colorrgb="r,g,b">apply an RGB color</color>
-// <colorcmyk="c,m,y,k">apply a CMYK color</color>
-// <color="name">apply a named color</color>
-
-
-// NECESSARY GLYPH CONFIGURATION:
-// Glyph
-//	image name/relative path
-//	dimensions
+// NECESSARY GLYPH CONFIGURATION IN A CSV:
+// 	name
+//	image name/relative path (relative to the CSV file)
+//	dimensions (in the unit of your document - recommend millimeters)
 //	fit method
 //	y offset
 
@@ -49,18 +45,22 @@ function applyComplexStyles() {
 }
 
 function fontStyle() {
-	applySimpleStyle("b", "Bold");
-	applySimpleStyle("i", "Italic");
-	applySimpleStyle("bi", "Bold Italic");
-
 	applyTextReplace("break", "\n");
 	applyTextReplace("dbreak", "\n\n");
 	applyTextReplace("empty", "");
+
+	applySimpleStyle("b", "Bold");
+	applySimpleStyle("i", "Italic");
+	applySimpleStyle("bi", "Bold Italic");
 
 	applyComplexStyle("font", applyFontChanges, true);
 	applyComplexStyle("glyph", applyGlyphTags, false);	
 	applyComplexStyle("cstyle", applyCharacterStyleChange, true);
 	applyComplexStyle("pstyle", applyParagraphStyleChange, true);
+
+	applyComplexStyle("colorrgb", applyColorRGB, true);
+	applyComplexStyle("colorcmyk", applyColorCMYK, true);
+	applyComplexStyle("color", applyNamedColor, true);
 }
 
 function applyTextReplace(tag, changeCode)
@@ -379,6 +379,21 @@ function applyFontChanges(selection, parameters)
 		{
 			selection.fontStyle = value;
 		}
+		else if (key == "color")
+		{
+			var newParameters = {"name": value};
+			applyNamedColor(selection, newParameters);
+		}
+		else if (key == "colorrgb")
+		{
+			var newParameters = {"color": value};
+			applyColorRGB(selection, newParameters);
+		}
+		else if (key == "colorcmyk")
+		{
+			var newParameters = {"color": value};
+			applyColorRGB(selection, newParameters);
+		}
 	}
 }
 
@@ -404,7 +419,7 @@ function applyCharacterStyleChange(selection, parameters)
 
 		if (key == "name")
 		{
-			var style = characterStyleByName(value);
+			var style = characterStyleByName(app.documents[0], value);
 			if (style != null)
 			{
 				selection.appliedCharacterStyle = style;
@@ -421,7 +436,7 @@ function applyParagraphStyleChange(selection, parameters)
 
 		if (key == "name")
 		{
-			var style = paragraphStyleByName(value);
+			var style = paragraphStyleByName(app.documents[0], value);
 			if (style != null)
 			{
 				selection.appliedParagraphStyle = style;
@@ -430,28 +445,73 @@ function applyParagraphStyleChange(selection, parameters)
 	}
 }
 
-function characterStyleByName(name)
+function applyNamedColor(selection, parameters)
 {
-	for (var i = 0; i < app.documents[0].characterStyles.length; ++i)
+	for(var key in parameters)
 	{
-		var style = app.documents[0].characterStyles[i];
-		if (style.name == name)
+		var value = parameters[key];
+
+		if (key == "name")
 		{
-			return style;
+			var color = colorByName(app.documents[0], value);
+			selection.fillColor = color;
 		}
 	}
-	return null;
 }
 
-function paragraphStyleByName(name)
+function applyColorRGB(selection, parameters)
 {
-	for (var i = 0; i < app.documents[0].paragraphStyles.length; ++i)
+	for(var key in parameters)
 	{
-		var style = app.documents[0].paragraphStyles[i];
-		if (style.name == name)
+		var value = parameters[key];
+
+		if (key == "color")
 		{
-			return style;
+			var colorName = "IDSS_ColorRGB_" + value;
+			var color = colorByName(app.documents[0], colorName);
+			if (color == null)
+			{
+				var colorValue = value.split(',');
+				colorValue[0] = Number(colorValue[0]);
+				colorValue[1] = Number(colorValue[1]);
+				colorValue[2] = Number(colorValue[2]);
+				if (colorValue.length == 4)
+					colorValue[3] = Number(colorValue[3]);
+				else
+					colorValue[3] = 255;
+
+				makeColor(app.documents[0], colorName, ColorSpace.RGB, ColorModel.PROCESS, colorValue);
+
+				newParameters = {"name":colorName};
+				applyNamedColor(selection, newParameters);
+			}
 		}
 	}
-	return null;
+}
+
+function applyColorCMYK(selection, parameters)
+{
+	for(var key in parameters)
+	{
+		var value = parameters[key];
+
+		if (key == "color")
+		{
+			var colorName = "IDSS_ColorCMYK_" + value;
+			var color = colorByName(app.documents[0], colorName);
+			if (color == null)
+			{
+				var colorValue = value.split(',');
+				colorValue[0] = Number(colorValue[0]);
+				colorValue[1] = Number(colorValue[1]);
+				colorValue[2] = Number(colorValue[2]);
+				colorValue[3] = Number(colorValue[3]);
+				
+				makeColor(app.documents[0], colorName, ColorSpace.CMYK, ColorModel.PROCESS, colorValue);
+
+				newParameters = {"name":colorName};
+				applyNamedColor(selection, newParameters);
+			}
+		}
+	}
 }
