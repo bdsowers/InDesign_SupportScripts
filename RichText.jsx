@@ -22,6 +22,7 @@
 //	y offset
 
 //@include "Utilities.jsx"
+//@include "ErrorHandler.jsx"
 
 var configFile = null;
 var configFilePath = null;
@@ -31,9 +32,13 @@ var glyphConfig = null;
 app.doScript(richText, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Rich Text");
 
 function richText() {
+	resetErrorHistory();
+
 	fontStyle();
 	applyComplexStyles();
 	replaceGlyphs();
+
+	displayErrorReport(false);
 }
 
 function applyComplexStyles() {
@@ -96,7 +101,15 @@ function applySimpleStyle(tag, fontStyle)
 
 	for (i = 0; i < f.length; i++)
 	{
-		f[i].fontStyle = fontStyle;
+		try
+		{
+			f[i].fontStyle = fontStyle;
+		}
+		catch(err)
+		{
+			reportError('Error applying font style: ' + fontStyle);
+		}
+
 		f[i].contents = f[i].contents.replace(beginTag, "");
 		f[i].contents = f[i].contents.replace(endTag, "");
 	}
@@ -122,8 +135,23 @@ function retrieveGlyphConfigIfNecessary()
 	if (configFile == null)
 	{
 		configFile = File.openDialog();
-		configFilePath = configFile.path;
-		glyphConfig = parseCSVWithFile(configFile);
+		if (configFile != null && configFile.exists)
+		{
+			configFilePath = configFile.path;
+
+			try
+			{
+				glyphConfig = parseCSVWithFile(configFile);
+			}
+			catch(err)
+			{
+				reportError('Error parsing glyph config: ' + configFile.path);
+				
+				configFile = null;
+				glyphConfig = null;
+				configFilePath = null;
+			}
+		}
 	}
 }
 
@@ -133,7 +161,10 @@ function applyGlyphToSelection(selection, glyphName, glyphConfig, configFilePath
 	var glyphInfo = glyphInfoForName(glyphConfig, name);
 	
 	if (glyphInfo == null)
+	{
+		reportError('No glyph info found for glyph: ' + name);
 		return;
+	}
 
 	var glyphPath = configFilePath + "/" + glyphInfo[1];
 	var glyphFile = new File(glyphPath);
@@ -157,35 +188,35 @@ function applyGlyphToSelection(selection, glyphName, glyphConfig, configFilePath
 		selection.remove();
 	}
 	else {
-		// Alert in some way
+		reportError('No glyph image found: ' + glyphInfo[1]);
 	}
 }
 
 function replaceGlyphs() {
-	if(app.documents.length != 0) {
-		var doc = app.activeDocument;	
-		
-		app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
-		app.findGrepPreferences.findWhat = "@.+?@";
-		var f = doc.findGrep(true);
-		
-		if (f.length == 0)
-			return;
-
-		var rect = null;
-
-		retrieveGlyphConfigIfNecessary();
-		
-		for (i = 0; i < f.length; i++) {
-			var glyphName = f[i].contents.replace(/@/g, "");
-			applyGlyphToSelection(f[i], glyphName, glyphConfig, configFilePath);
-		}
+	var doc = app.activeDocument;	
 	
-		app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
+	app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
+	app.findGrepPreferences.findWhat = "@.+?@";
+	var f = doc.findGrep(true);
+	
+	if (f.length == 0)
+		return;
+
+	var rect = null;
+
+	retrieveGlyphConfigIfNecessary();
+	if (glyphConfig == null)
+	{
+		reportError('No glyph config specified');
+		return;
 	}
-	else{
-		alert("Please open a document and try again.");
-	}	
+
+	for (i = 0; i < f.length; i++) {
+		var glyphName = f[i].contents.replace(/@/g, "");
+		applyGlyphToSelection(f[i], glyphName, glyphConfig, configFilePath);
+	}
+
+	app.findObjectPreferences = app.changeGrepPreferences  = NothingEnum.NOTHING;
 }
 
 function strToFitMethod(str)
@@ -211,14 +242,16 @@ function strToFitMethod(str)
 	{
 		return FitOptions.CENTER_CONTENT;
 	}
+	else
+	{
+		reportError('Invalid fit method: ' + str);
+	}
 
 	return FitOptions.PROPORTIONALLY;
 }
 
 function strToSizeArray(str)
 {
-	return [5,5];
-
 	str = trim(str);
 	elements = str.split(",");
 	return [Number(elements[0]), Number(elements[1])];
@@ -256,7 +289,7 @@ function applyComplexStyle(tag, responseFunction, containsInnerElement)
 		var result = regEx.exec(f[i].contents);
 		if (!containsInnerElement)
 		{
-			// f[i].remove();
+			// Do nothing - it will be removed elsewhere
 		}
 		else if (result != null)
 		{
@@ -276,82 +309,89 @@ function parseTagParameters(str)
 {
 	parameters = {};
 
-	var started = false;
-	var currentStr = "";
-	var inQuote = false;
-	var key = "";
-	var value = "";
-
-	for (var i = 0; i < str.length; ++i)
+	try
 	{
-		var c = str[i];
-		if (c == '<')
-		{
-			// This is the beginning; ignore it
-		}
-		else if (c == '>')
-		{
-			// We're finished - wrap things up and return
-			if (key.length > 0 && currentStr.length > 0)
-			{
-				value = currentStr;
+		var started = false;
+		var currentStr = "";
+		var inQuote = false;
+		var key = "";
+		var value = "";
 
-				parameters[key] = value;
-				return parameters;
+		for (var i = 0; i < str.length; ++i)
+		{
+			var c = str[i];
+			if (c == '<')
+			{
+				// This is the beginning; ignore it
 			}
-		}
-		else if (isQuote(c))
-		{
-			inQuote = !inQuote;
-
-			// If we were building something, the end of the quote is the end of
-			// the thing.
-			if (!inQuote)
+			else if (c == '>')
 			{
-				value = currentStr;
+				// We're finished - wrap things up and return
+				if (key.length > 0 && currentStr.length > 0)
+				{
+					value = currentStr;
 
-				parameters[key] = value;
+					parameters[key] = value;
+					return parameters;
+				}
+			}
+			else if (isQuote(c))
+			{
+				inQuote = !inQuote;
+
+				// If we were building something, the end of the quote is the end of
+				// the thing.
+				if (!inQuote)
+				{
+					value = currentStr;
+
+					parameters[key] = value;
+					
+					key = "";
+					value = "";
+					currentStr = "";
+				}
+			}
+			else if (c == ' ')
+			{
+				// Spaces don't necessarily mean much and can usually be ignored.
+				// However, immediately after building a parameter, spaces mark the beginning
+				// of the next one.
+				// Also we don't care about much of anything until after the first space.
+				started = true;
+
+				if (inQuote)
+				{
+					currentStr += c;
+				}
+
+				if (key != currentStr && key.length > 0 && currentStr.length > 0 && !inQuote)
+				{
+					value = currentStr;
+
+					parameters[key] = value;
+					
+					key = "";
+					value = "";
+					currentStr = "";
+				}
+			}
+			else if (c == '=')
+			{
+				// We've finished creating the key; now we need to start working on the value
+				key = currentStr;
 				
-				key = "";
-				value = "";
 				currentStr = "";
 			}
-		}
-		else if (c == ' ')
-		{
-			// Spaces don't necessarily mean much and can usually be ignored.
-			// However, immediately after building a parameter, spaces mark the beginning
-			// of the next one.
-			// Also we don't care about much of anything until after the first space.
-			started = true;
-
-			if (inQuote)
+			else if (started)
 			{
 				currentStr += c;
 			}
-
-			if (key != currentStr && key.length > 0 && currentStr.length > 0 && !inQuote)
-			{
-				value = currentStr;
-
-				parameters[key] = value;
-				
-				key = "";
-				value = "";
-				currentStr = "";
-			}
 		}
-		else if (c == '=')
-		{
-			// We've finished creating the key; now we need to start working on the value
-			key = currentStr;
-			
-			currentStr = "";
-		}
-		else if (started)
-		{
-			currentStr += c;
-		}
+	}
+	catch(err)
+	{
+		reportError('Error parsing markup: ' + str);
 	}
 
 	return parameters;
@@ -365,19 +405,47 @@ function applyFontChanges(selection, parameters)
 
 		if (key == "size_mul")
 		{
-			selection.pointSize *= Number(value);
+			if (Number(value) > 0)
+			{
+				selection.pointSize *= Number(value);
+			}
+			else
+			{
+				reportError('Invalid font size multiplier: ' + value);
+			}
 		}
 		else if (key == "size")
 		{
-			selection.pointSize = Number(value);
+			if (Number(value) > 0)
+			{
+				selection.pointSize = Number(value);
+			}
+			else
+			{
+				reportError('Invalid font size: ' + value);
+			}
 		}
 		else if (key == "font_change")
 		{
-			selection.appliedFont = value;
+			try
+			{
+				selection.appliedFont = value;
+			}
+			catch(err)
+			{
+				reportError('Invalid font specified: ' + value);
+			}
 		}
 		else if (key == "style")
 		{
-			selection.fontStyle = value;
+			try
+			{
+				selection.fontStyle = value;
+			}
+			catch(err)
+			{
+				reportError('Invalid font style specified: ' + value);
+			}
 		}
 		else if (key == "color")
 		{
@@ -406,6 +474,13 @@ function applyGlyphTags(selection, parameters)
 		if (key == "name")
 		{
 			retrieveGlyphConfigIfNecessary();
+
+			if (glyphConfig == null)
+			{
+				reportError('No glyph config specified');
+				return;
+			}
+
 			applyGlyphToSelection(selection, value, glyphConfig, configFilePath);
 		}
 	}
@@ -424,6 +499,10 @@ function applyCharacterStyleChange(selection, parameters)
 			{
 				selection.appliedCharacterStyle = style;
 			}
+			else
+			{
+				reportError('No character style in project: ' + value);
+			}
 		}
 	}
 }
@@ -441,6 +520,10 @@ function applyParagraphStyleChange(selection, parameters)
 			{
 				selection.appliedParagraphStyle = style;
 			}
+			else
+			{
+				reportError('No paragraph style in project: ' + value);
+			}
 		}
 	}
 }
@@ -454,6 +537,13 @@ function applyNamedColor(selection, parameters)
 		if (key == "name")
 		{
 			var color = colorByName(app.documents[0], value);
+
+			if (color == null)
+			{
+				reportError('No named color in project: ' + value);
+				return;
+			}
+
 			selection.fillColor = color;
 		}
 	}
@@ -472,6 +562,13 @@ function applyColorRGB(selection, parameters)
 			if (color == null)
 			{
 				var colorValue = value.split(',');
+
+				if (colorValue == null || colorValue.length < 3)
+				{
+					reportError('Invalid RGB value specified: ' + value);
+					return;
+				}
+
 				colorValue[0] = Number(colorValue[0]);
 				colorValue[1] = Number(colorValue[1]);
 				colorValue[2] = Number(colorValue[2]);
@@ -502,6 +599,13 @@ function applyColorCMYK(selection, parameters)
 			if (color == null)
 			{
 				var colorValue = value.split(',');
+				
+				if (colorValue == null || colorValue.length > 4)
+				{
+					reportError('Invalid CMYK value specified: ' + value);
+					return;
+				}
+
 				colorValue[0] = Number(colorValue[0]);
 				colorValue[1] = Number(colorValue[1]);
 				colorValue[2] = Number(colorValue[2]);
