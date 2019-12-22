@@ -19,7 +19,7 @@ If you open up the Scripts system in InDesign, you can find the exact folder eas
 ## RichText
 For large projects, you'll want to write all your text in a spreadsheet and then import
 that into InDesign. However, there's no built-in way to markup that text when
-you want to make it bold or drop in glyphs. Previously this was a manual step you had to do
+you want to make it bold or drop in inline images (glyphs). Previously this was a manual step you had to do
 after your import.
 
 The RichText script seeks to change that: run the script over your files after
@@ -39,7 +39,10 @@ you want to format, and the script will handle the formatting.
 - Designate an empty data cell using the `<empty>` tag, which will be replaced with empty text.
 - Apply InDesign character styles using `<cstyle name="...">cstyle tags</cstyle>`
 - Apply paragraph styles using `<pstyle name="...">pstyle tags</pstyle>`
-- Three ways to change colors: `<color name="..."></color>, <colorrgb value="r,g,b"></colorrgb> and <colorcmyk="c,m,y,k"></colorcmyk>`
+- Three ways to change colors:
+	- `<color name="..."></color>` - used a named color in your swatch
+	- `<colorrgb value="r,g,b"></colorrgb>` - use an RGB color
+	- `<colorcmyk="c,m,y,k"></colorcmyk>` - use a CMYK color
 - The `<font>` tag is a catchall that has a lot of parameters you can set:
 	- font_change - provide the name of a new font
 	- size_mul - multiplier on the current font size
@@ -58,12 +61,12 @@ An example file is contained in SupportScripts/Examples/GlyphExamples
 
 ### Limitations:
 - Nested tags are not supported.
+	- Use character styles coupled with the `<cstyle>` tag for really intricate changes. This is the most flexible/powerful, and the recommended workflow when something simple won't do.
+	- The `<font>` tag can also change multiple attributes at once on a chunk of text, but it's limited to a fixed set of attributes.
+	- Some nested tags *might* work, but support for this is spotty at best. Don't rely on it. The markup system was designed to make simple changes easy, but was never intended for super intricate changes.
+- When using the b, i, and bi tags, you must ensure the font you're using has Bold, Italic and Bold Italic styles appropriately. Otherwise these tags will cause an error.
 
 ### Roadmap:
-- More robust glyph support
-- Support for color change
-- Support for simple font changes
-- Support for applying arbitrary character styles
 - More robust error handling
 
 ## Label Support
