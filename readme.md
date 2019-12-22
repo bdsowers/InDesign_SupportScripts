@@ -63,7 +63,7 @@ The columsn in the CSV:
 - <b>name</b> - friendly name given to the glyph; this is the name you'll use in your InDesign doc when you want to drop it in.
 - <b>path</b> - the path of the glyph *relative to the config file*. Full paths are currently not supported (and rarely what you really want for a big project).
 - <b>size x,y</b> - the size of the glyph. This is in the units of your document (pixels, millimeters, picas, whatever). We recommend using millimeters.
-- <b>fit style</b> - how the glyph fits in the frame if the above size isn't the same as the image size. Typically we recommend PROPORTIONALLY
+- <b>fit style</b> - how the glyph fits in the frame if the above size isn't the same as the image size. Typically we recommend PROPORTIONALLY, which will fit the image within the frame while maintaining its aspect ratio. However, we support all InDesign fit styles.
 - <b>yOffset</b> - how much the glyph should be shifted on the Y axis (up/down). This will depend on the glyph size and the font size. You'll probably have to play with this number a bit. 
 
 ### Limitations:
