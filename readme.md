@@ -60,11 +60,11 @@ By default, the script will ask for a configuration file that details glyph conf
 An example file is contained in SupportScripts/Examples/GlyphExamples
 
 The columsn in the CSV:
-- name - friendly name given to the glyph; this is the name you'll use in your InDesign doc when you want to drop it in.
-- path - the path of the glyph *relative to the config file*. Full paths are currently not supported (and rarely what you really want for a big project).
-- size x,y - the size of the glyph. This is in the units of your document (pixels, millimeters, picas, whatever). We recommend using millimeters.
-- fit style - how the glyph fits in the frame if the above size isn't the same as the image size. Typically we recommend PROPORTIONALLY
-- yOffset - how much the glyph should be shifted on the Y axis (up/down). This will depend on the glyph size and the font size. You'll probably have to play with this number a bit. 
+- <b>name</b> - friendly name given to the glyph; this is the name you'll use in your InDesign doc when you want to drop it in.
+- <b>path</b> - the path of the glyph *relative to the config file*. Full paths are currently not supported (and rarely what you really want for a big project).
+- <b>size x,y</b> - the size of the glyph. This is in the units of your document (pixels, millimeters, picas, whatever). We recommend using millimeters.
+- <b>fit style</b> - how the glyph fits in the frame if the above size isn't the same as the image size. Typically we recommend PROPORTIONALLY
+- <b>yOffset</b> - how much the glyph should be shifted on the Y axis (up/down). This will depend on the glyph size and the font size. You'll probably have to play with this number a bit. 
 
 ### Limitations:
 - Nested tags are not supported.
