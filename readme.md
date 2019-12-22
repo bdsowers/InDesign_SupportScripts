@@ -33,9 +33,22 @@ you want to format, and the script will handle the formatting.
 - Make text <i>italic</i> by putting it in `<i>italic</i>` tags
 - Make text <b><i>bold & italic</i></b> by putting it in `<bi>bold italic</bi>` tags
 - Drop in a @glyph@ by putting the glyph name within @ characters.
+- You can also drop in glyphs using <glyph name="glyph"> tags!
 - Add manual newlines using a single `<break>` tag. Line breaks in a CSV will blow things up.
 - Add manual double breaks using a `<dbreak>` tag.
 - Designate an empty data cell using the `<empty>` tag, which will be replaced with empty text.
+- Apply InDesign character styles using `<cstyle name="...">cstyle tags</cstyle>`
+- Apply paragraph styles using `<pstyle name="...">pstyle tags</pstyle>`
+- Three ways to change colors: `<color name="..."></color>, <colorrgb value="r,g,b"></colorrgb> and <colorcmyk="c,m,y,k"></colorcmyk>`
+- The `<font>` tag is a catchall that has a lot of parameters you can set:
+	-- font_change - provide the name of a new font
+	-- size_mul - multiplier on the current font size
+	-- size - change the current font size to a fixed value
+	-- style - change the font style (ie: 'Bold', 'Italic', etc; options depend on the font)
+	-- color - change to a named color in your InDesign swatch
+	-- colorrgb - change to an RGB color
+	-- colorcmyk - change to a CMYK color
+	-- Example: `<font font_change="Arial" size_mul="2" style="Bold" colorrgb="255,0,0">Styled text here!</font>`
 
 ### Glyph Use:
 To utilize glyphs, the script needs configuration information for each glyph.
