@@ -494,7 +494,7 @@ function applyCharacterStyleChange(selection, parameters)
 
 		if (key == "name")
 		{
-			var style = characterStyleByName(app.documents[0], value);
+			var style = characterStyleByName(app.activeDocument, value);
 			if (style != null)
 			{
 				selection.appliedCharacterStyle = style;
@@ -515,7 +515,7 @@ function applyParagraphStyleChange(selection, parameters)
 
 		if (key == "name")
 		{
-			var style = paragraphStyleByName(app.documents[0], value);
+			var style = paragraphStyleByName(app.activeDocument, value);
 			if (style != null)
 			{
 				selection.appliedParagraphStyle = style;
@@ -536,7 +536,7 @@ function applyNamedColor(selection, parameters)
 
 		if (key == "name")
 		{
-			var color = colorByName(app.documents[0], value);
+			var color = colorByName(app.activeDocument, value);
 
 			if (color == null)
 			{
@@ -558,7 +558,7 @@ function applyColorRGB(selection, parameters)
 		if (key == "color")
 		{
 			var colorName = "IDSS_ColorRGB_" + value;
-			var color = colorByName(app.documents[0], colorName);
+			var color = colorByName(app.activeDocument, colorName);
 			if (color == null)
 			{
 				var colorValue = value.split(',');
@@ -577,7 +577,7 @@ function applyColorRGB(selection, parameters)
 				else
 					colorValue[3] = 255;
 
-				makeColor(app.documents[0], colorName, ColorSpace.RGB, ColorModel.PROCESS, colorValue);
+				makeColor(app.activeDocument, colorName, ColorSpace.RGB, ColorModel.PROCESS, colorValue);
 
 				newParameters = {"name":colorName};
 				applyNamedColor(selection, newParameters);
@@ -595,7 +595,7 @@ function applyColorCMYK(selection, parameters)
 		if (key == "color")
 		{
 			var colorName = "IDSS_ColorCMYK_" + value;
-			var color = colorByName(app.documents[0], colorName);
+			var color = colorByName(app.activeDocument, colorName);
 			if (color == null)
 			{
 				var colorValue = value.split(',');
@@ -611,7 +611,7 @@ function applyColorCMYK(selection, parameters)
 				colorValue[2] = Number(colorValue[2]);
 				colorValue[3] = Number(colorValue[3]);
 				
-				makeColor(app.documents[0], colorName, ColorSpace.CMYK, ColorModel.PROCESS, colorValue);
+				makeColor(app.activeDocument, colorName, ColorSpace.CMYK, ColorModel.PROCESS, colorValue);
 
 				newParameters = {"name":colorName};
 				applyNamedColor(selection, newParameters);

@@ -1,8 +1,18 @@
 //@include "Utilities/Utilities.jsx"
+//@include "Utilities/ErrorHandler.jsx"
 
 app.doScript(labelSupport, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Tag Support");
 
 function labelSupport()
+{
+	resetErrorHistory();
+
+	hideLabelObjects();
+
+	displayErrorReport(false);
+}
+
+function hideLabelObjects()
 {
 	var arr = parseCSV();
 	
@@ -91,17 +101,22 @@ function hideObjectsWithLabel(label, page)
 {
 	var objects = [];
 
+	var objectRemoved = false;
+
 	for (var i = 0; i < page.allPageItems.length; ++i)
 	{
 		var item = page.allPageItems[i];
 
-		if (item != null && item.label == label)
+		if (item != null && trim(item.label).toUpperCase() == trim(label).toUpperCase())
 		{
 			item.remove();
 
-			objects.push(item);
+			objectRemoved = true;
 		}
 	}
 
-	return objects;
+	if (!objectRemoved)
+	{
+		reportError("No object with label found: " + label);
+	}
 }
