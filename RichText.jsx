@@ -21,8 +21,8 @@
 //	fit method
 //	y offset
 
-//@include "Utilities.jsx"
-//@include "ErrorHandler.jsx"
+//@include "Utilities/Utilities.jsx"
+//@include "Utilities/ErrorHandler.jsx"
 
 var configFile = null;
 var configFilePath = null;

@@ -1,4 +1,4 @@
-//@include "Utilities.jsx"
+//@include "Utilities/Utilities.jsx"
 
 app.doScript(labelSupport, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Tag Support");
 
