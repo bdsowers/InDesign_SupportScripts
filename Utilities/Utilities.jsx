@@ -1,3 +1,5 @@
+//@include "ErrorHandler.jsx"
+
 // Yanked from StackOverflow because we're in 2019 now and CSV parsing
 // still is something you have to dig through solutions for...
 // https://stackoverflow.com/questions/1293147/javascript-code-to-parse-csv-data
@@ -64,6 +66,10 @@ function trim(str)
     return str.replace(/^\s+|\s+$/gm,'');
 }
 
+function isQuote(character)
+{
+    return character == '"' || character == '”';    
+}
 
 function characterStyleByName(doc, name)
 {
@@ -97,3 +103,96 @@ function makeColor(doc, colorName, colorSpace, colorModel, colorValue)
     
     return color; 
 } 
+
+// HTML-esque attribute parsing
+function parseTagParameters(str)
+{
+    parameters = {};
+
+    try
+    {
+        var started = false;
+        var currentStr = "";
+        var inQuote = false;
+        var key = "";
+        var value = "";
+
+        for (var i = 0; i < str.length; ++i)
+        {
+            var c = str[i];
+            if (c == '<')
+            {
+                // This is the beginning; ignore it
+            }
+            else if (c == '>')
+            {
+                // We're finished - wrap things up and return
+                if (key.length > 0 && currentStr.length > 0)
+                {
+                    value = currentStr;
+
+                    parameters[key] = value;
+                    return parameters;
+                }
+            }
+            else if (isQuote(c))
+            {
+                inQuote = !inQuote;
+
+                // If we were building something, the end of the quote is the end of
+                // the thing.
+                if (!inQuote)
+                {
+                    value = currentStr;
+
+                    parameters[key] = value;
+                    
+                    key = "";
+                    value = "";
+                    currentStr = "";
+                }
+            }
+            else if (c == ' ')
+            {
+                // Spaces don't necessarily mean much and can usually be ignored.
+                // However, immediately after building a parameter, spaces mark the beginning
+                // of the next one.
+                // Also we don't care about much of anything until after the first space.
+                started = true;
+
+                if (inQuote)
+                {
+                    currentStr += c;
+                }
+
+                if (key != currentStr && key.length > 0 && currentStr.length > 0 && !inQuote)
+                {
+                    value = currentStr;
+
+                    parameters[key] = value;
+                    
+                    key = "";
+                    value = "";
+                    currentStr = "";
+                }
+            }
+            else if (c == '=')
+            {
+                // We've finished creating the key; now we need to start working on the value
+                key = currentStr;
+                
+                currentStr = "";
+            }
+            else if (started)
+            {
+                currentStr += c;
+            }
+        }
+    }
+    catch(err)
+    {
+        reportError('Error parsing markup: ' + str);
+    }
+
+    return parameters;
+}
