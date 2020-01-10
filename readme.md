@@ -11,6 +11,7 @@ If you open up the Scripts system in InDesign, you can find the exact folder eas
 - Windows -> Utilities -> Scripts
 - Right click the 'User' folder
 - Click 'Reveal in Explorer' (or Reveal in Finder)
+- There will be a 'Scripts Panel' folder that the scripts should be placed in
 
 ## Usage
 - In InDesign, open the Scripts window (Windows -> Utilities -> Scripts)
